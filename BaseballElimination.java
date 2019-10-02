@@ -96,6 +96,11 @@ public class BaseballElimination {
 
     }
 
+    private int getTeamId(String team) {
+        return teams.get(team).id;
+
+    }
+
     // number of remaining games between team1 and team2
     public int against(String team1, String team2) {
         return teams.get(team1).matchup[teams.get(team2).id];
@@ -104,8 +109,23 @@ public class BaseballElimination {
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
+        boolean debug = true;
+        if (debug) StdOut.println("\nChecking: " + team);
+
         //trivial elimination
         if (maxWins > remaining(team) + wins(team)) return true;
+        //no trivial elimination, construct flow network
+        for (String teamName : teams()) {
+            if (getTeamId(teamName) == getTeamId(team)) continue;
+            if (debug) StdOut.println(teamName);
+            for (String teamInner : teams()) {
+                if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
+                        teamInner)) continue;
+
+                if (debug) StdOut.println(" - " + teamInner);
+            }
+        }
+
         return false;
     }
 
