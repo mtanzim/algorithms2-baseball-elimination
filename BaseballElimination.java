@@ -107,6 +107,18 @@ public class BaseballElimination {
 
     }
 
+    // https://www.geeksforgeeks.org/program-calculate-value-ncr/
+    // Returns factorial of n
+    private int fact(int n) {
+        int res = 1;
+        for (int i = 2; i <= n; i++)
+            res = res * i;
+        return res;
+    }
+    // This code is Contributed by
+    // Smitha Dinesh Semwal.
+
+
     // is given team eliminated?
     public boolean isEliminated(String team) {
         boolean debug = true;
@@ -115,15 +127,36 @@ public class BaseballElimination {
         //trivial elimination
         if (maxWins > remaining(team) + wins(team)) return true;
         //no trivial elimination, construct flow network
+        int[] teamNodes = new int[numberOfTeams() - 1];
+        int[][] vsNodes = new int[fact(numberOfTeams() - 1)][2];
+
+        int teamI = 0;
+        int vsI = 0;
         for (String teamName : teams()) {
             if (getTeamId(teamName) == getTeamId(team)) continue;
-            if (debug) StdOut.println(teamName);
+            if (debug) StdOut.println("add node: " + teamName);
+            teamNodes[teamI] = getTeamId(teamName);
             for (String teamInner : teams()) {
                 if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
                         teamInner)) continue;
 
-                if (debug) StdOut.println(" - " + teamInner);
+                // if (debug) StdOut.println("\t add node: " + teamName + " - " + teamInner);
+                boolean duplicateCombo = false;
+                for (int i = 0; i < vsI - 1; i++) {
+                    if (vsNodes[i][0] == getTeamId(teamInner) && vsNodes[i][1] == getTeamId(
+                            teamName)) {
+                        duplicateCombo = true;
+                    }
+                }
+                if (!duplicateCombo) {
+                    vsNodes[vsI][0] = getTeamId(teamName);
+                    vsNodes[vsI][1] = getTeamId(teamInner);
+                    if (debug) StdOut.println("\t add node: " + teamName + " - " + teamInner);
+
+                }
+                vsI++;
             }
+            teamI++;
         }
 
         return false;
@@ -142,7 +175,8 @@ public class BaseballElimination {
         if (debug) {
             for (String team : division.teams()) {
                 for (String teamB : division.teams()) {
-                    StdOut.println(team + " vs " + teamB + " : " + division.against(team, teamB));
+                    StdOut.println(
+                            team + " vs " + teamB + " : " + division.against(team, teamB));
                 }
                 StdOut.println();
             }
