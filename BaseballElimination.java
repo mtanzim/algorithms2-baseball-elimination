@@ -15,6 +15,7 @@ public class BaseballElimination {
     private ArrayList<String> teamNames = new ArrayList<String>();
     private HashMap<String, Team> teams = new HashMap<String, Team>();
     private int teamCount = 0;
+    private int maxWins = -1;
 
     private class Team {
         int id;
@@ -29,6 +30,8 @@ public class BaseballElimination {
             this.l = l;
             this.r = r;
             this.matchup = matchup;
+
+            if (w > maxWins) maxWins = w;
         }
     }
 
@@ -55,8 +58,9 @@ public class BaseballElimination {
                 }
                 if (debug)
                     StdOut.println(Arrays.toString(matchup));
-                Team curTeam = new Team(i - 1, Integer.parseInt(tokens[1]), Integer.parseInt(tokens[2]),
-                        Integer.parseInt(tokens[3]), matchup);
+                Team curTeam = new Team(i - 1, Integer.parseInt(tokens[1]),
+                                        Integer.parseInt(tokens[2]),
+                                        Integer.parseInt(tokens[3]), matchup);
                 teams.put(tokens[0], curTeam);
             }
 
@@ -100,35 +104,42 @@ public class BaseballElimination {
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
-        return true;
+        //trivial elimination
+        if (maxWins > remaining(team) + wins(team)) return true;
+        return false;
     }
 
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
         return new ArrayList<String>();
+        // return null;
     }
 
     public static void main(String[] args) {
+        boolean debug = false;
         StdOut.println("testing: " + args[0]);
         BaseballElimination division = new BaseballElimination(args[0]);
-        for (String team : division.teams()) {
-            for (String teamB : division.teams()) {
-                StdOut.println(team + " vs " + teamB + " : " + division.against(team, teamB));
+        if (debug) {
+            for (String team : division.teams()) {
+                for (String teamB : division.teams()) {
+                    StdOut.println(team + " vs " + teamB + " : " + division.against(team, teamB));
+                }
+                StdOut.println();
             }
-            StdOut.println();
         }
         for (String team : division.teams()) {
-            StdOut.println(team);
-            StdOut.println(division.wins(team));
-            StdOut.println(division.losses(team));
-            StdOut.println(division.remaining(team));
+            if (debug) StdOut.println(team);
+            if (debug) StdOut.println(division.wins(team));
+            if (debug) StdOut.println(division.losses(team));
+            if (debug) StdOut.println(division.remaining(team));
             if (division.isEliminated(team)) {
                 StdOut.print(team + " is eliminated by the subset R = { ");
                 for (String t : division.certificateOfElimination(team)) {
                     StdOut.print(t + " ");
                 }
                 StdOut.println("}");
-            } else {
+            }
+            else {
                 StdOut.println(team + " is not eliminated");
             }
         }
