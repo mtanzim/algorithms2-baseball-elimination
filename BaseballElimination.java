@@ -4,6 +4,9 @@
  *  Description: Baseball Elimination using mincut/maxflow
  **************************************************************************** */
 
+import edu.princeton.cs.algs4.FlowEdge;
+import edu.princeton.cs.algs4.FlowNetwork;
+import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
@@ -23,6 +26,8 @@ public class BaseballElimination {
         int l;
         int r;
         int[] matchup;
+        boolean isElim = false;
+        ArrayList<String> certificateOfElimination;
 
         public Team(int id, int w, int l, int r, int[] matchup) {
             this.id = id;
@@ -30,8 +35,24 @@ public class BaseballElimination {
             this.l = l;
             this.r = r;
             this.matchup = matchup;
-
+            this.certificateOfElimination = null;
             if (w > maxWins) maxWins = w;
+        }
+
+        public void setCert(ArrayList<String> names) {
+            certificateOfElimination = names;
+        }
+
+        public ArrayList<String> getCert() {
+            return certificateOfElimination;
+        }
+
+        public boolean getElim() {
+            return isElim;
+        }
+
+        public void setElim(boolean isElim) {
+            this.isElim = isElim;
         }
     }
 
@@ -108,6 +129,10 @@ public class BaseballElimination {
     }
 
     // https://www.geeksforgeeks.org/program-calculate-value-ncr/
+    private int nCr(int n, int r) {
+        return fact(n) / (fact(r) * fact(n - r));
+    }
+
     // Returns factorial of n
     private int fact(int n) {
         int res = 1;
@@ -121,22 +146,44 @@ public class BaseballElimination {
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
-        boolean debug = true;
+        boolean debug = false;
+
+
         if (debug) StdOut.println("\nChecking: " + team);
 
         //trivial elimination
-        if (maxWins > remaining(team) + wins(team)) return true;
-        //no trivial elimination, construct flow network
-        int[] teamNodes = new int[numberOfTeams() - 1];
-        int[][] vsNodes = new int[fact(numberOfTeams() - 1)][2];
+        if (maxWins > remaining(team) + wins(team)) {
+            Team curTeam = teams.get(team);
+            curTeam.setElim(true);
+            ArrayList<String> elimnators = new ArrayList<String>();
+            for (String teamName : teams()) {
+                if (getTeamId(teamName) == getTeamId(team)) continue;
 
+                elimnators.add(teamName);
+            }
+            curTeam.setCert(elimnators);
+            return true;
+        }
+
+        //no trivial elimination, construct flow network
+        // team nodes are identified on the flow network by their id [0 => n-1]
+        int SOURCE_NODE = numberOfTeams();
+        int TARGET_NODE = SOURCE_NODE + 1;
+        // versus nodes are identified by [n+2 => nCr(n-1) + n + 2)
+        FlowNetwork flowN = new FlowNetwork(numberOfTeams() + nCr(numberOfTeams() - 1, 2) + 2);
+
+        int[] teamNodes = new int[numberOfTeams()];
+        String[] teamNameLU = new String[numberOfTeams()];
+        int[][] vsNodes = new int[fact(numberOfTeams() - 1)][2];
         int teamI = 0;
         int vsI = 0;
+        int vsNodeTracker = TARGET_NODE + 1;
 
         for (String teamName : teams()) {
-            if (getTeamId(teamName) == getTeamId(team)) continue;
-            // if (debug) StdOut.println("add node: " + teamName);
             teamNodes[teamI] = getTeamId(teamName);
+            teamNameLU[teamI] = teamName;
+            if (getTeamId(teamName) == getTeamId(team)) continue;
+
             for (String teamInner : teams()) {
                 if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
                         teamInner)) continue;
@@ -152,6 +199,18 @@ public class BaseballElimination {
                 if (!duplicateCombo) {
                     vsNodes[vsI][0] = getTeamId(teamName);
                     vsNodes[vsI][1] = getTeamId(teamInner);
+
+                    // may need to decode team combos later
+                    flowN.addEdge(
+                            new FlowEdge(SOURCE_NODE, vsNodeTracker, against(teamName, teamInner)));
+                    flowN.addEdge(
+                            new FlowEdge(vsNodeTracker, getTeamId(teamName),
+                                         Double.POSITIVE_INFINITY));
+                    flowN.addEdge(
+                            new FlowEdge(vsNodeTracker, getTeamId(teamInner),
+                                         Double.POSITIVE_INFINITY));
+                    vsNodeTracker++;
+
                     if (debug) {
                         StdOut.println(
                                 "\n\tsource => " + teamName + " - " + teamInner + ", capacity: "
@@ -169,18 +228,42 @@ public class BaseballElimination {
             }
             // wx + rx - wn
             int capper = wins(team) + remaining(team) - wins(teamName);
-            StdOut.println("\t" + teamName + " => target, capacity: " + capper);
+            flowN.addEdge(
+                    new FlowEdge(getTeamId(teamName), TARGET_NODE,
+                                 capper));
+            if (debug) StdOut.println("\t" + teamName + " => target, capacity: " + capper);
             teamI++;
         }
 
-        StdOut.println("\n");
+        if (debug) StdOut.println("\n");
+        if (debug) StdOut.println(flowN.toString());
 
-        return false;
+        FordFulkerson maxFlow = new FordFulkerson(flowN, SOURCE_NODE, TARGET_NODE);
+        ArrayList<String> elimnators = new ArrayList<String>();
+
+        boolean isElim = false;
+        if (debug) StdOut.print("\nEliminated by: ");
+        for (int v = 0; v < numberOfTeams(); v++) {
+            if (maxFlow.inCut(v)) {
+                isElim = true;
+                elimnators.add(teamNameLU[v]);
+                if (debug) StdOut.print(teamNameLU[v] + " ");
+            }
+        }
+
+        Team curTeam = teams.get(team);
+        curTeam.setCert(elimnators);
+        curTeam.setElim(isElim);
+
+        if (debug) StdOut.println("\n");
+
+        return isElim;
     }
 
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
-        return new ArrayList<String>();
+        return teams.get(team).getCert();
+        // return new ArrayList<String>();
         // return null;
     }
 
