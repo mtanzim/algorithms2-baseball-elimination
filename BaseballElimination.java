@@ -132,9 +132,10 @@ public class BaseballElimination {
 
         int teamI = 0;
         int vsI = 0;
+
         for (String teamName : teams()) {
             if (getTeamId(teamName) == getTeamId(team)) continue;
-            if (debug) StdOut.println("add node: " + teamName);
+            // if (debug) StdOut.println("add node: " + teamName);
             teamNodes[teamI] = getTeamId(teamName);
             for (String teamInner : teams()) {
                 if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
@@ -151,13 +152,28 @@ public class BaseballElimination {
                 if (!duplicateCombo) {
                     vsNodes[vsI][0] = getTeamId(teamName);
                     vsNodes[vsI][1] = getTeamId(teamInner);
-                    if (debug) StdOut.println("\t add node: " + teamName + " - " + teamInner);
+                    if (debug) {
+                        StdOut.println(
+                                "\n\tsource => " + teamName + " - " + teamInner + ", capacity: "
+                                        + against(teamName, teamInner));
+                        StdOut.println("\t" + teamName + " - " + teamInner + " => " + teamName
+                                               + ", capacity: " + Double.POSITIVE_INFINITY);
+                        StdOut.println("\t" + teamName + " - " + teamInner + " => " + teamInner
+                                               + ", capacity: " + Double.POSITIVE_INFINITY);
+
+
+                    }
 
                 }
                 vsI++;
             }
+            // wx + rx - wn
+            int capper = wins(team) + remaining(team) - wins(teamName);
+            StdOut.println("\t" + teamName + " => target, capacity: " + capper);
             teamI++;
         }
+
+        StdOut.println("\n");
 
         return false;
     }
