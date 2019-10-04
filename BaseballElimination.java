@@ -170,16 +170,19 @@ public class BaseballElimination {
         int SOURCE_NODE = numberOfTeams();
         int TARGET_NODE = SOURCE_NODE + 1;
         // versus nodes are identified by [n+2 => nCr(n-1) + n + 2)
+        //this doens't work for big numbers!!!
         FlowNetwork flowN = new FlowNetwork(numberOfTeams() + nCr(numberOfTeams() - 1, 2) + 2);
 
-        int[] teamNodes = new int[numberOfTeams()];
+        // int[] teamNodes = new int[numberOfTeams()];
         String[] teamNameLU = new String[numberOfTeams()];
-        int[][] vsNodes = new int[fact(numberOfTeams() - 1)][2];
+        // int[][] vsNodes = new int[fact(numberOfTeams() - 1)][2];
+        ArrayList<String> teamCombos = new ArrayList<String>();
+
         int teamI = 0;
         int vsI = 0;
         int vsNodeTracker = TARGET_NODE + 1;
         for (String teamName : teams()) {
-            teamNodes[teamI] = getTeamId(teamName);
+            // teamNodes[teamI] = getTeamId(teamName);
             teamNameLU[teamI] = teamName;
             if (getTeamId(teamName) == getTeamId(team)) {
                 teamI++;
@@ -191,16 +194,17 @@ public class BaseballElimination {
                         teamInner)) continue;
 
                 // if (debug) StdOut.println("\t add node: " + teamName + " - " + teamInner);
-                boolean duplicateCombo = false;
-                for (int i = 0; i < vsI - 1; i++) {
-                    if (vsNodes[i][0] == getTeamId(teamInner) && vsNodes[i][1] == getTeamId(
-                            teamName)) {
-                        duplicateCombo = true;
-                    }
-                }
-                if (!duplicateCombo) {
-                    vsNodes[vsI][0] = getTeamId(teamName);
-                    vsNodes[vsI][1] = getTeamId(teamInner);
+                // boolean duplicateCombo = false;
+                // for (int i = 0; i < vsI - 1; i++) {
+                //     if (vsNodes[i][0] == getTeamId(teamInner) && vsNodes[i][1] == getTeamId(
+                //             teamName)) {
+                //         duplicateCombo = true;
+                //     }
+                // }
+                // if (!duplicateCombo) {
+                if (!teamCombos.contains(teamInner + "" + teamName)) {
+                    // vsNodes[vsI][0] = getTeamId(teamName);
+                    // vsNodes[vsI][1] = getTeamId(teamInner);
 
                     // may need to decode team combos later
                     flowN.addEdge(
@@ -212,6 +216,8 @@ public class BaseballElimination {
                             new FlowEdge(vsNodeTracker, getTeamId(teamInner),
                                          Double.POSITIVE_INFINITY));
                     vsNodeTracker++;
+                    teamCombos.add(teamName + "" + teamInner);
+
 
                     if (debug) {
                         StdOut.println(
