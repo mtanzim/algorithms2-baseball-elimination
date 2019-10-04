@@ -67,6 +67,7 @@ public class BaseballElimination {
         while (file.hasNextLine()) {
             String curLine = file.readLine();
             if (i != 0) {
+                curLine = curLine.trim();
                 String[] tokens = curLine.split("\\s+");
                 if (debug)
                     StdOut.println(Arrays.toString(tokens));
@@ -143,7 +144,6 @@ public class BaseballElimination {
     // This code is Contributed by
     // Smitha Dinesh Semwal.
 
-
     // is given team eliminated?
     public boolean isEliminated(String team) {
         boolean debug = false;
@@ -178,11 +178,13 @@ public class BaseballElimination {
         int teamI = 0;
         int vsI = 0;
         int vsNodeTracker = TARGET_NODE + 1;
-
         for (String teamName : teams()) {
             teamNodes[teamI] = getTeamId(teamName);
             teamNameLU[teamI] = teamName;
-            if (getTeamId(teamName) == getTeamId(team)) continue;
+            if (getTeamId(teamName) == getTeamId(team)) {
+                teamI++;
+                continue;
+            }
 
             for (String teamInner : teams()) {
                 if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
@@ -242,9 +244,11 @@ public class BaseballElimination {
         ArrayList<String> elimnators = new ArrayList<String>();
 
         boolean isElim = false;
-        if (debug) StdOut.print("\nEliminated by: ");
+        if (debug) StdOut.print("Team Name LU: ");
+        if (debug) StdOut.print(Arrays.toString(teamNameLU));
         for (int v = 0; v < numberOfTeams(); v++) {
             if (maxFlow.inCut(v)) {
+                if (debug) StdOut.print("\nEliminated by: " + v);
                 isElim = true;
                 elimnators.add(teamNameLU[v]);
                 if (debug) StdOut.print(teamNameLU[v] + " ");
