@@ -93,6 +93,10 @@ public class BaseballElimination {
             i++;
         }
 
+        for (String team:teamNames) {
+            elim(team);
+        }
+
     }
 
     // number of teams
@@ -107,28 +111,34 @@ public class BaseballElimination {
 
     // number of wins for given team
     public int wins(String team) {
+        if (!teams.containsKey(team)) throw new IllegalArgumentException("invalid key");
         return teams.get(team).w;
     }
 
     // number of losses for given team
     public int losses(String team) {
+        if (!teams.containsKey(team)) throw new IllegalArgumentException("invalid key");
         return teams.get(team).l;
 
     }
 
     // number of remaining games for given team
     public int remaining(String team) {
+        if (!teams.containsKey(team)) throw new IllegalArgumentException("invalid key");
         return teams.get(team).r;
 
     }
 
     private int getTeamId(String team) {
+        if (!teams.containsKey(team)) throw new IllegalArgumentException("invalid key");
         return teams.get(team).id;
 
     }
 
     // number of remaining games between team1 and team2
     public int against(String team1, String team2) {
+        if (!teams.containsKey(team1)) throw new IllegalArgumentException("invalid key");
+        if (!teams.containsKey(team2)) throw new IllegalArgumentException("invalid key");
         return teams.get(team1).matchup[teams.get(team2).id];
 
     }
@@ -141,12 +151,14 @@ public class BaseballElimination {
         return (int) ret;
     }
 
+    public boolean isEliminated(String team){
+        if (!teams.containsKey(team)) throw new IllegalArgumentException("invalid key");
+        return teams.get(team).getElim();
+    }
 
     // is given team eliminated?
-    public boolean isEliminated(String team) {
+    private void elim(String team) {
         boolean debug = false;
-
-
         if (debug) StdOut.println("\nChecking: " + team);
 
         //trivial elimination
@@ -154,15 +166,14 @@ public class BaseballElimination {
             Team curTeam = teams.get(team);
             curTeam.setElim(true);
             ArrayList<String> elimnators = new ArrayList<String>();
-            // for (String teamName : teams()) {
-            //     if (getTeamId(teamName) == getTeamId(team)) continue;
-            //
-            //     elimnators.add(teamName);
-            // }
             elimnators.add(teamWithMax);
             curTeam.setCert(elimnators);
+            Team trivialTeam = teams.get(team);
+            trivialTeam.setCert(elimnators);
+            trivialTeam.setElim(true);
+
             if (debug) StdOut.println("trivial");
-            return true;
+            return;
         }
 
         //no trivial elimination, construct flow network
@@ -255,7 +266,7 @@ public class BaseballElimination {
 
         if (debug) StdOut.println("\n");
 
-        return isElim;
+        return;
     }
 
     // subset R of teams that eliminates given team; null if not eliminated

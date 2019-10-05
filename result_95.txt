@@ -1,0 +1,339 @@
+See the Assessment Guide for information on how to interpret this report.
+
+ASSESSMENT SUMMARY
+
+Compilation:  PASSED
+API:          PASSED
+
+Spotbugs:     FAILED (1 warning)
+PMD:          FAILED (6 warnings)
+Checkstyle:   FAILED (0 errors, 13 warnings)
+
+Correctness:  21/23 tests passed
+Memory:       4/4 tests passed
+Timing:       1/1 tests passed
+
+Aggregate score: 94.78%
+[Compilation: 5%, API: 5%, Spotbugs: 0%, PMD: 0%, Checkstyle: 0%, Correctness: 60%, Memory: 10%, Timing: 20%]
+
+ASSESSMENT DETAILS
+
+The following files were submitted:
+----------------------------------
+ 11K Oct  5 22:56 BaseballElimination.java
+
+
+********************************************************************************
+*  COMPILING                                                                    
+********************************************************************************
+
+
+% javac11 BaseballElimination.java
+*-----------------------------------------------------------
+
+
+================================================================
+
+
+Checking the APIs of your programs.
+*-----------------------------------------------------------
+BaseballElimination:
+
+================================================================
+
+
+********************************************************************************
+*  CHECKING STYLE AND COMMON BUG PATTERNS                                       
+********************************************************************************
+
+
+% spotbugs *.class
+*-----------------------------------------------------------
+L P SIC_INNER_SHOULD_BE_STATIC_NEEDS_THIS SIC: Should the inner class 'BaseballElimination$Team' be refactored into a static nested class?  At BaseballElimination.java:[lines 30-60]
+Warnings generated: 1
+
+
+================================================================
+
+
+% pmd .
+*-----------------------------------------------------------
+BaseballElimination.java:18: The private instance (or static) variable 'teamNames' can be made 'final'; it is initialized only in the declaration or constructor. [ImmutableField]
+BaseballElimination.java:19: The private instance (or static) variable 'teams' can be made 'final'; it is initialized only in the declaration or constructor. [ImmutableField]
+BaseballElimination.java:20: The private instance (or static) variable 'teamCount' can be made 'final'; it is initialized only in the declaration or constructor. [ImmutableField]
+BaseballElimination.java:33: The user-supplied array 'matchup' is stored directly. [ArrayIsStoredDirectly]
+BaseballElimination.java:54: A getX() method which returns a boolean should be named isX() [BooleanGetMethodName]
+BaseballElimination.java:194: Avoid unused local variables, such as 'vsI'. [UnusedLocalVariable]
+PMD ends with 6 warnings.
+
+
+================================================================
+
+
+% checkstyle *.java
+*-----------------------------------------------------------
+[WARN] BaseballElimination.java:27:13: Do not use the letter 'l' as an instance variable name. It is hard to distinguish from the number '1'. [MemberName]
+[WARN] BaseballElimination.java:33:53: Do not use the letter 'l' as a parameter variable name. It is hard to distinguish from the number '1'. [ParameterName]
+[WARN] BaseballElimination.java:58:37: The local (or parameter) variable 'isElim' has the same name as an instance variable. Use a different name. [HiddenField]
+[WARN] BaseballElimination.java:81:28: To specify an array type, put the square brackets before the variable name, e.g., 'String[] args' instead of 'String args[]'. [ArrayTypeStyle]
+[WARN] BaseballElimination.java:146:36: The parameter variable 'N' must start with a lowercase letter and use camelCase. [ParameterName]
+[WARN] BaseballElimination.java:146:49: The parameter variable 'K' must start with a lowercase letter and use camelCase. [ParameterName]
+[WARN] BaseballElimination.java:154:45: '{' is not preceded with whitespace. [WhitespaceAround]
+[WARN] BaseballElimination.java:164:11: '//' or '/*' is not followed by whitespace. [WhitespaceAfter]
+[WARN] BaseballElimination.java:179:11: '//' or '/*' is not followed by whitespace. [WhitespaceAfter]
+[WARN] BaseballElimination.java:184:11: '//' or '/*' is not followed by whitespace. [WhitespaceAfter]
+[WARN] BaseballElimination.java:185:45: ',' is not followed by whitespace. [WhitespaceAfter]
+Checkstyle ends with 0 errors and 11 warning.
+
+% custom checkstyle checks for BaseballElimination.java
+*-----------------------------------------------------------
+[WARN] BaseballElimination.java:82:30: The numeric literal '4' appears to be unnecessary. [NumericLiteral]
+[WARN] BaseballElimination.java:83:33: The numeric literal '4' appears to be unnecessary. [NumericLiteral]
+Checkstyle ends with 0 errors and 2 warnings.
+
+
+================================================================
+
+
+********************************************************************************
+*  TESTING CORRECTNESS
+********************************************************************************
+
+Testing correctness of BaseballElimination
+*-----------------------------------------------------------
+Running 23 total tests.
+
+Test 1: check numberOfTeams()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 2: check teams()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 3: check wins()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 4: check losses()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 5: check remaining()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 6: check against()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 7a: check isEliminated() when n = 4
+  * teams4.txt
+  * teams4a.txt
+  * teams4b.txt
+==> passed
+
+Test 7b: check isEliminated() when n = 5
+  * teams5.txt
+  * teams5a.txt
+  * teams5b.txt
+  * teams5c.txt
+==> passed
+
+Test 7c: check isEliminated() when n = 6 to 19
+  * teams7.txt
+  * teams8.txt
+  * teams10.txt
+  * teams12.txt
+  * teams12-allgames.txt
+==> passed
+
+Test 7d: check isEliminated() when n = 20 to 30
+  * teams24.txt
+  * teams29.txt
+  * teams30.txt
+==> passed
+
+Test 7e: check isEliminated() when n = 30 to 50
+  * teams32.txt
+  * teams36.txt
+  * teams42.txt
+  * teams48.txt
+==> passed
+
+Test 8: check that isEliminated() is consistent with certificateOfElimination()
+  * teams4.txt
+  * teams5.txt
+  * teams8.txt
+  * teams10.txt
+  * teams29.txt
+  * teams48.txt
+==> passed
+
+Test 9a: check certificateOfElimination() when n = 4
+  * teams4.txt
+  * teams4a.txt
+  * teams4b.txt
+==> passed
+
+Test 9b: check certificateOfElimination() when n = 5
+  * teams5.txt
+  * teams5a.txt
+  * teams5b.txt
+  * teams5c.txt
+==> passed
+
+Test 9c: check certificateOfElimination() when n = 6 to 20
+  * teams7.txt
+  * teams8.txt
+  * teams10.txt
+  * teams12.txt
+  * teams12-allgames.txt
+==> passed
+
+Test 9d: check certificateOfElimination() when n = 20 to 30
+  * teams24.txt
+  * teams29.txt
+  * teams30.txt
+==> passed
+
+Test 9e: check certificateOfElimination() when n = 30 to 50
+  * teams32.txt
+  * teams36.txt
+  * teams42.txt
+  * teams48.txt
+==> passed
+
+Test 10: check methods when n = 1
+  * teams1.txt
+  * teams1.txt
+  * teams1.txt
+  * teams1.txt
+  * teams1.txt
+  * teams1.txt
+  * teams1.txt
+==> passed
+
+Test 11: check immutability by calling certificateOfElimination() both before
+         and after calling isEliminated() and verifying that the results match
+  * teams4.txt
+  * teams5.txt
+  * teams29.txt
+==> passed
+
+Test 12: check that certificateOfElimination() returns null for eliminated teams
+  * teams4.txt
+    - fails when checking the elimination status of 'Atlanta'
+    - student   certificate of elimination = { }
+    - reference certificate of elimination = null
+
+  * teams5.txt
+    - fails when checking the elimination status of 'New_York'
+    - student   certificate of elimination = { }
+    - reference certificate of elimination = null
+
+==> FAILED
+
+Test 13: check for invalid arguments
+  * teams4.txt
+    - java.lang.IllegalArgumentException not thrown for certificateOfElimination("Princeton")
+  * teams5.txt
+    - java.lang.IllegalArgumentException not thrown for certificateOfElimination("Princeton")
+==> FAILED
+
+Test 14: check for dependence on reference equality of strings
+==> passed
+
+Test 15: check that two Baseball objects can be created at the same time
+  * teams4.txt and teams5.txt
+  * teams5.txt and teams7.txt
+==> passed
+
+
+Total: 21/23 tests passed!
+
+
+================================================================
+********************************************************************************
+*  TIMING
+********************************************************************************
+
+Timing BaseballElimination
+*-----------------------------------------------------------
+Running 1 total tests.
+
+    n   constructor isEliminated() + certificateOfElimination()
+----------------------------------------------------------------
+   30       0.32       0.00
+   36       0.57       0.00
+   42       1.09       0.00
+   48       2.00       0.00
+   54       3.36       0.00
+   60       5.52       0.00
+time = 2.01e-07 * n^4.17  (R^2 = 1.00)
+
+Total: 1/1 tests passed!
+
+
+================================================================
+
+
+
+********************************************************************************
+*  MEMORY
+********************************************************************************
+
+Analyzing memory of BaseballElimination
+*-----------------------------------------------------------
+Running 4 total tests.
+
+Student   vertices     = 0.50 n^2 - 0.50 n + 3.00   (R^2 = 1.000)
+Reference vertices     = 0.50 n^2 - 0.50 n + 3.00   (R^2 = 1.000)
+=> passed
+
+Student   edges        = 1.50 n^2 - 3.50 n + 2.00   (R^2 = 1.000)
+Reference edges        = 1.50 n^2 - 3.50 n + 2.00   (R^2 = 1.000)
+=> passed
+
+Student   memory of G  = 176.00 n^2 - 384.00 n + 384.00   (R^2 = 1.000)
+Reference memory of G  = 176.00 n^2 - 384.00 n + 384.00   (R^2 = 1.000)
+=> passed
+
+Student   memory       = 3.74 n^2 + 273.35 n + 171.14   (R^2 = 1.000)
+Reference memory       = 3.99 n^2 + 214.25 n + 396.00   (R^2 = 1.000)
+=> passed
+
+Total: 4/4 tests passed!
+
+
+================================================================
