@@ -19,6 +19,7 @@ public class BaseballElimination {
     private HashMap<String, Team> teams = new HashMap<String, Team>();
     private int teamCount = 0;
     private int maxWins = -1;
+    private String teamWithMax = null;
 
     private class Team {
         int id;
@@ -27,16 +28,19 @@ public class BaseballElimination {
         int r;
         int[] matchup;
         boolean isElim = false;
-        ArrayList<String> certificateOfElimination;
+        ArrayList<String> certificateOfElimination = null;
 
-        public Team(int id, int w, int l, int r, int[] matchup) {
+        public Team(int id, String name, int w, int l, int r, int[] matchup) {
             this.id = id;
             this.w = w;
             this.l = l;
             this.r = r;
             this.matchup = matchup;
             this.certificateOfElimination = null;
-            if (w > maxWins) maxWins = w;
+            if (w > maxWins) {
+                maxWins = w;
+                teamWithMax = name;
+            }
         }
 
         public void setCert(ArrayList<String> names) {
@@ -80,7 +84,7 @@ public class BaseballElimination {
                 }
                 if (debug)
                     StdOut.println(Arrays.toString(matchup));
-                Team curTeam = new Team(i - 1, Integer.parseInt(tokens[1]),
+                Team curTeam = new Team(i - 1, tokens[0], Integer.parseInt(tokens[1]),
                                         Integer.parseInt(tokens[2]),
                                         Integer.parseInt(tokens[3]), matchup);
                 teams.put(tokens[0], curTeam);
@@ -128,30 +132,15 @@ public class BaseballElimination {
         return teams.get(team1).matchup[teams.get(team2).id];
 
     }
-    //https://stackoverflow.com/questions/2201113/combinatoric-n-choose-r-in-java-math
-    // private String binomial(final int N, final int K) {
-    //     BigInteger ret = BigInteger.ONE;
-    //     for (int k = 0; k < K; k++) {
-    //         ret = ret.multiply(BigInteger.valueOf(N-k))
-    //                  .divide(BigInteger.valueOf(k+1));
-    //     }
-    //     return ret.toString();
-    // }
-
-    // https://www.geeksforgeeks.org/program-calculate-value-ncr/
-    private double nCr(int n, int r) {
-        return fact(n) / (fact(r) * fact(n - r));
+    // https://stackoverflow.com/questions/2201113/combinatoric-n-choose-r-in-java-math
+    private int binomial(final int N, final int K) {
+        long ret = 1;
+        for (int k = 0; k < K; k++) {
+            ret = (ret * (N-k))/(k+1);
+        }
+        return (int) ret;
     }
 
-    // Returns factorial of n
-    private double fact(int n) {
-        double res = 1;
-        for (int i = 2; i <= n; i++)
-            res = res * i;
-        return res;
-    }
-    // This code is Contributed by
-    // Smitha Dinesh Semwal.
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
@@ -165,12 +154,14 @@ public class BaseballElimination {
             Team curTeam = teams.get(team);
             curTeam.setElim(true);
             ArrayList<String> elimnators = new ArrayList<String>();
-            for (String teamName : teams()) {
-                if (getTeamId(teamName) == getTeamId(team)) continue;
-
-                elimnators.add(teamName);
-            }
+            // for (String teamName : teams()) {
+            //     if (getTeamId(teamName) == getTeamId(team)) continue;
+            //
+            //     elimnators.add(teamName);
+            // }
+            elimnators.add(teamWithMax);
             curTeam.setCert(elimnators);
+            if (debug) StdOut.println("trivial");
             return true;
         }
 
@@ -180,7 +171,7 @@ public class BaseballElimination {
         int TARGET_NODE = SOURCE_NODE + 1;
         // versus nodes are identified by [n+2 => nCr(n-1) + n + 2)
         //this doens't work for big numbers!!!
-        int ncr = (int) nCr(numberOfTeams()-1,2);
+        int ncr = binomial(numberOfTeams()-1,2);
         FlowNetwork flowN = new FlowNetwork(numberOfTeams() + ncr + 2);
 
         // int[] teamNodes = new int[numberOfTeams()];
@@ -203,20 +194,7 @@ public class BaseballElimination {
                 if (getTeamId(teamInner) == getTeamId(team) || getTeamId(teamName) == getTeamId(
                         teamInner)) continue;
 
-                // if (debug) StdOut.println("\t add node: " + teamName + " - " + teamInner);
-                // boolean duplicateCombo = false;
-                // for (int i = 0; i < vsI - 1; i++) {
-                //     if (vsNodes[i][0] == getTeamId(teamInner) && vsNodes[i][1] == getTeamId(
-                //             teamName)) {
-                //         duplicateCombo = true;
-                //     }
-                // }
-                // if (!duplicateCombo) {
                 if (!teamCombos.contains(teamInner + "" + teamName)) {
-                    // vsNodes[vsI][0] = getTeamId(teamName);
-                    // vsNodes[vsI][1] = getTeamId(teamInner);
-
-                    // may need to decode team combos later
                     flowN.addEdge(
                             new FlowEdge(SOURCE_NODE, vsNodeTracker, against(teamName, teamInner)));
                     flowN.addEdge(
@@ -283,8 +261,6 @@ public class BaseballElimination {
     // subset R of teams that eliminates given team; null if not eliminated
     public Iterable<String> certificateOfElimination(String team) {
         return teams.get(team).getCert();
-        // return new ArrayList<String>();
-        // return null;
     }
 
     public static void main(String[] args) {
