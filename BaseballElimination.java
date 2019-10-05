@@ -181,7 +181,6 @@ public class BaseballElimination {
         int SOURCE_NODE = numberOfTeams();
         int TARGET_NODE = SOURCE_NODE + 1;
         // versus nodes are identified by [n+2 => nCr(n-1) + n + 2)
-        //this doens't work for big numbers!!!
         int ncr = binomial(numberOfTeams()-1,2);
         FlowNetwork flowN = new FlowNetwork(numberOfTeams() + ncr + 2);
 
