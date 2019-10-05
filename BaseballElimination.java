@@ -10,6 +10,7 @@ import edu.princeton.cs.algs4.FordFulkerson;
 import edu.princeton.cs.algs4.In;
 import edu.princeton.cs.algs4.StdOut;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -128,21 +129,15 @@ public class BaseballElimination {
         return teams.get(team1).matchup[teams.get(team2).id];
 
     }
-
-    // https://www.geeksforgeeks.org/program-calculate-value-ncr/
-    private int nCr(int n, int r) {
-        return fact(n) / (fact(r) * fact(n - r));
+    //https://stackoverflow.com/questions/2201113/combinatoric-n-choose-r-in-java-math
+    private String binomial(final int N, final int K) {
+        BigInteger ret = BigInteger.ONE;
+        for (int k = 0; k < K; k++) {
+            ret = ret.multiply(BigInteger.valueOf(N-k))
+                     .divide(BigInteger.valueOf(k+1));
+        }
+        return ret.toString();
     }
-
-    // Returns factorial of n
-    private int fact(int n) {
-        int res = 1;
-        for (int i = 2; i <= n; i++)
-            res = res * i;
-        return res;
-    }
-    // This code is Contributed by
-    // Smitha Dinesh Semwal.
 
     // is given team eliminated?
     public boolean isEliminated(String team) {
@@ -171,7 +166,8 @@ public class BaseballElimination {
         int TARGET_NODE = SOURCE_NODE + 1;
         // versus nodes are identified by [n+2 => nCr(n-1) + n + 2)
         //this doens't work for big numbers!!!
-        FlowNetwork flowN = new FlowNetwork(numberOfTeams() + nCr(numberOfTeams() - 1, 2) + 2);
+        int nCr = Integer.parseInt(binomial(numberOfTeams()-1,2));
+        FlowNetwork flowN = new FlowNetwork(numberOfTeams() + nCr + 2);
 
         // int[] teamNodes = new int[numberOfTeams()];
         String[] teamNameLU = new String[numberOfTeams()];
